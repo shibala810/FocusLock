@@ -33,7 +33,7 @@ final class AppState {
     let bank = QuestionBank()
 
     var schedules: [Schedule] {
-        didSet { persistSchedules(); rebuildNotifications() }
+        didSet { persistSchedules(); rebuildNotifications(); reconcileDeviceActivity() }
     }
     var unlockSettings: UnlockSettings {
         didSet { persistSettings() }
@@ -123,6 +123,10 @@ final class AppState {
         let lead = notifyMinutesBefore
         let on = notificationsEnabled
         Task { await NotificationService.shared.rebuild(schedules: snap, leadMinutes: lead, enabled: on) }
+    }
+    private func reconcileDeviceActivity() {
+        let snap = schedules
+        Task { await ScreenTimeService.shared.reconcileSchedules(snap) }
     }
     private func persistSettings() {
         if let data = try? JSONEncoder().encode(unlockSettings) {
