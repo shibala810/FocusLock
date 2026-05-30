@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-enum AppRoute: Hashable { case welcome, main, block, editSchedule, unlock }
+enum AppRoute: Hashable { case welcome, main, block, editSchedule, unlock, questionBank }
 enum MainTab: Hashable, CaseIterable { case home, schedule, stats, settings }
 
 enum AppTheme: String, CaseIterable, Codable {
@@ -150,6 +150,7 @@ private func routeFromString(_ s: String) -> AppRoute? {
     case "block": return .block
     case "editschedule": return .editSchedule
     case "unlock": return .unlock
+    case "questionbank": return .questionBank
     default: return nil
     }
 }

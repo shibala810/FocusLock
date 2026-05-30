@@ -26,6 +26,9 @@ struct RootView: View {
             case .unlock:
                 UnlockFlowView()
                     .transition(.opacity)
+            case .questionBank:
+                QuestionBankScreen()
+                    .transition(.move(edge: .trailing))
             }
         }
         .animation(.easeInOut(duration: 0.28), value: app.route)

@@ -125,6 +125,11 @@ struct SettingsScreen: View {
                                     ), range: 1...60, suffix: " 分")
                                 })
                             }
+                            FLRow(title: "題庫", sub: "瀏覽、匯入自訂題目",
+                                  icon: { LineIcon(name: .book, size: 20, color: fl.focus) },
+                                  iconBg: fl.focusSoft,
+                                  right: { LineIcon(name: .chevron, size: 18, color: fl.inkFaint) },
+                                  onTap: { app.route = .questionBank })
                             FLRow(title: "關於 FocusLock", sub: "版本 1.0 ・ 麻糬出品",
                                   icon: { LineIcon(name: .info, size: 20, color: fl.inkSoft) },
                                   right: { LineIcon(name: .chevron, size: 18, color: fl.inkFaint) },
