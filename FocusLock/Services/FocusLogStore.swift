@@ -130,6 +130,17 @@ final class FocusLogStore {
     }
     #endif
 
+    /// Today's "early unlock" attempts — quiz-passed + emergency. Used to
+    /// enforce the daily limit configured in UnlockSettings.
+    func earlyUnlocksToday(asOf date: Date = Date()) -> Int {
+        let day = calendar.startOfDay(for: date)
+        let next = calendar.date(byAdding: .day, value: 1, to: day) ?? day
+        return sessions.filter {
+            $0.startedAt >= day && $0.startedAt < next &&
+            ($0.endReason == .quizUnlocked || $0.endReason == .emergency)
+        }.count
+    }
+
     var emergencyCount: Int  { sessions.filter { $0.endReason == .emergency    }.count }
     var quizUnlockCount: Int { sessions.filter { $0.endReason == .quizUnlocked }.count }
     var completedCount: Int  { sessions.filter { $0.endReason == .completed    }.count }

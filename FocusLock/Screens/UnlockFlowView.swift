@@ -57,6 +57,11 @@ struct UnlockFlowView: View {
     }
 
     // ----- CONFIRM -----
+    private var dailyQuota: Int { app.unlockSettings.dailyLimit }
+    private var usedToday: Int { app.log.earlyUnlocksToday() }
+    private var quotaHit: Bool { dailyQuota > 0 && usedToday >= dailyQuota }
+    private var remainingToday: Int { max(0, dailyQuota - usedToday) }
+
     private var confirmView: some View {
         VStack(spacing: 0) {
             Spacer()
@@ -66,47 +71,68 @@ struct UnlockFlowView: View {
             }
             .flWiggle()
 
-            Text("真的要解鎖嗎?")
+            Text(quotaHit ? "今天的解鎖額度用完了" : "真的要解鎖嗎?")
                 .font(.system(size: 26, weight: .heavy))
                 .padding(.top, 14)
+                .multilineTextAlignment(.center)
 
-            (Text("先深呼吸一下。確定要中斷專注的話,\n你得通過 ")
-             + Text("\(needCorrect) 題").foregroundStyle(fl.primaryDeep).bold()
-             + Text("考驗才能放行喔。"))
-            .font(.system(size: 14.5))
-            .foregroundStyle(fl.inkSoft)
-            .multilineTextAlignment(.center)
-            .lineSpacing(4)
-            .padding(.top, 12)
-            .padding(.horizontal, 26)
+            quotaHit
+            ? AnyView(
+                Text("再撐一下,明天就回來,衝動就過去了。\n你已經用掉今天的 \(dailyQuota) 次提前解鎖。")
+                    .font(.system(size: 14.5))
+                    .foregroundStyle(fl.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.top, 12)
+                    .padding(.horizontal, 26)
+            )
+            : AnyView(
+                (Text("先深呼吸一下。確定要中斷專注的話,\n你得通過 ")
+                 + Text("\(needCorrect) 題").foregroundStyle(fl.primaryDeep).bold()
+                 + Text("考驗才能放行喔。")
+                 + (dailyQuota > 0
+                    ? Text("\n今天還剩 ").foregroundStyle(fl.inkSoft)
+                      + Text("\(remainingToday) 次").foregroundStyle(fl.primaryDeep).bold()
+                      + Text("機會。").foregroundStyle(fl.inkSoft)
+                    : Text("")))
+                .font(.system(size: 14.5))
+                .foregroundStyle(fl.inkSoft)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.top, 12)
+                .padding(.horizontal, 26)
+            )
 
-            FLCard(cornerRadius: 20, smallShadow: true) {
-                HStack(spacing: 10) {
-                    LineIcon(name: .info, size: 20, color: fl.amber)
-                    Text("科目範圍:\(app.unlockSettings.subjects.map(\.rawValue).joined(separator: "、"))・高一～高二")
-                        .font(.system(size: 13))
-                        .foregroundStyle(fl.inkSoft)
+            if !quotaHit {
+                FLCard(cornerRadius: 20, smallShadow: true) {
+                    HStack(spacing: 10) {
+                        LineIcon(name: .info, size: 20, color: fl.amber)
+                        Text("科目範圍:\(app.unlockSettings.subjects.map(\.rawValue).joined(separator: "、"))・高一～高二")
+                            .font(.system(size: 13))
+                            .foregroundStyle(fl.inkSoft)
+                    }
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 18)
                 }
-                .padding(.vertical, 14)
-                .padding(.horizontal, 18)
+                .padding(.top, 22)
+                .padding(.horizontal, 26)
             }
-            .padding(.top, 22)
-            .padding(.horizontal, 26)
 
             Spacer()
 
             VStack(spacing: 10) {
                 Button { startCooldown() } label: {
-                    Text("我想清楚了,繼續解鎖")
+                    Text(quotaHit ? "今天不能再解鎖了" : "我想清楚了,繼續解鎖")
                 }
                 .buttonStyle(FLCTAStyle(
                     gradient: LinearGradient(colors: [fl.amber, Color(hex: 0xD68A2E)],
                                              startPoint: .top, endPoint: .bottom),
                     shadowColor: Color(hex: 0xC97F26)
                 ))
+                .disabled(quotaHit)
 
                 Button { cancel() } label: {
-                    Text("算了,我再撐一下 💪")
+                    Text(quotaHit ? "好,我繼續專注 💪" : "算了,我再撐一下 💪")
                         .font(.system(size: 15.5, weight: .heavy))
                         .foregroundStyle(fl.focus)
                         .frame(maxWidth: .infinity)
@@ -114,16 +140,18 @@ struct UnlockFlowView: View {
                 }
                 .buttonStyle(.plain)
 
-                Button { showEmergencyConfirm = true } label: {
-                    HStack(spacing: 4) {
-                        LineIcon(name: .siren, size: 13, color: fl.inkFaint)
-                        Text("緊急解鎖(會被記錄 · 已用 \(app.emergencyUnlockCount) 次)")
+                if !quotaHit {
+                    Button { showEmergencyConfirm = true } label: {
+                        HStack(spacing: 4) {
+                            LineIcon(name: .siren, size: 13, color: fl.inkFaint)
+                            Text("緊急解鎖(會被記錄 · 已用 \(app.emergencyUnlockCount) 次)")
+                        }
+                        .font(.system(size: 12, weight: .heavy))
+                        .foregroundStyle(fl.inkFaint)
+                        .padding(.vertical, 6)
                     }
-                    .font(.system(size: 12, weight: .heavy))
-                    .foregroundStyle(fl.inkFaint)
-                    .padding(.vertical, 6)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 26)
             .padding(.bottom, 36)

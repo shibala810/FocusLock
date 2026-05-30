@@ -83,7 +83,7 @@ struct SettingsScreen: View {
 
                         // unlock difficulty
                         FLGroup(header: "解鎖難度",
-                                footer: "提高題數會讓提前解鎖更困難 —— 越難,越能逼自己專注。") {
+                                footer: "提高題數或拉長冷靜倒數能讓提前解鎖更困難。每日上限設 0 = 不限。") {
                             FLRow(title: "解鎖需答對題數", sub: "冷靜倒數後的考驗",
                                   icon: { LineIcon(name: .book, size: 20, color: fl.focus) },
                                   iconBg: fl.focusSoft,
@@ -92,6 +92,24 @@ struct SettingsScreen: View {
                                     get: { app.unlockSettings.needCorrect },
                                     set: { app.unlockSettings.needCorrect = $0 }
                                 ), range: 1...5, suffix: " 題")
+                            })
+                            FLRow(title: "冷靜倒數", sub: "按下解鎖後強制等待",
+                                  icon: { LineIcon(name: .breath, size: 20, color: fl.focus) },
+                                  iconBg: fl.focusSoft,
+                                  right: {
+                                FLStepper(value: Binding(
+                                    get: { app.unlockSettings.cooldownSeconds },
+                                    set: { app.unlockSettings.cooldownSeconds = $0 }
+                                ), range: 0...900, step: 15, suffix: " 秒")
+                            })
+                            FLRow(title: "每日提前解鎖上限", sub: "答題 + 緊急合計;用完當天不能再開",
+                                  icon: { LineIcon(name: .siren, size: 20, color: fl.amber) },
+                                  iconBg: fl.amberSoft,
+                                  right: {
+                                FLStepper(value: Binding(
+                                    get: { app.unlockSettings.dailyLimit },
+                                    set: { app.unlockSettings.dailyLimit = $0 }
+                                ), range: 0...10, suffix: " 次")
                             },
                                   last: true)
                         }

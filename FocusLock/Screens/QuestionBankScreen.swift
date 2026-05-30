@@ -12,6 +12,7 @@ struct QuestionBankScreen: View {
     @State private var selectedSubject: Subject? = nil
     @State private var showImporter = false
     @State private var importError: String? = nil
+    @State private var showClearConfirm = false
 
     var body: some View {
         let counts = app.bank.counts()
@@ -43,6 +44,21 @@ struct QuestionBankScreen: View {
                         }
                         .buttonStyle(FLCTAStyle())
 
+                        if !app.bank.custom.isEmpty {
+                            Button { showClearConfirm = true } label: {
+                                HStack(spacing: 8) {
+                                    LineIcon(name: .trash, size: 16, color: fl.danger)
+                                    Text("清除 \(app.bank.custom.count) 題自訂題目")
+                                }
+                                .font(.system(size: 14, weight: .heavy))
+                                .foregroundStyle(fl.danger)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background(Capsule().fill(fl.dangerSoft))
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         Text("檔案格式參考 Resources/questions.json")
                             .font(.system(size: 11.5))
                             .foregroundStyle(fl.inkFaint)
@@ -65,6 +81,15 @@ struct QuestionBankScreen: View {
             Button("好", role: .cancel) { importError = nil }
         } message: {
             Text(importError ?? "")
+        }
+        .alert("清除自訂題目?", isPresented: $showClearConfirm) {
+            Button("取消", role: .cancel) { }
+            Button("確認清除", role: .destructive) {
+                app.bank.clearCustom()
+                if selectedSubject != nil { selectedSubject = nil }
+            }
+        } message: {
+            Text("會移除你匯入的全部自訂題目(\(app.bank.custom.count) 題)。原本內建題庫不受影響,只是再也抽不到自訂題。")
         }
     }
 
