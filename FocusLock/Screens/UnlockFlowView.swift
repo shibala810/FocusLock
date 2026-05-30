@@ -33,6 +33,7 @@ struct UnlockFlowView: View {
     @State private var reveal: Bool = false
 
     @State private var cooldownTimer: Timer? = nil
+    @State private var showEmergencyConfirm = false
 
     private var needCorrect: Int { app.unlockSettings.needCorrect }
 
@@ -112,9 +113,26 @@ struct UnlockFlowView: View {
                         .padding(.vertical, 15)
                 }
                 .buttonStyle(.plain)
+
+                Button { showEmergencyConfirm = true } label: {
+                    HStack(spacing: 4) {
+                        LineIcon(name: .siren, size: 13, color: fl.inkFaint)
+                        Text("緊急解鎖(會被記錄 · 已用 \(app.emergencyUnlockCount) 次)")
+                    }
+                    .font(.system(size: 12, weight: .heavy))
+                    .foregroundStyle(fl.inkFaint)
+                    .padding(.vertical, 6)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 26)
             .padding(.bottom, 36)
+        }
+        .alert("使用緊急解鎖?", isPresented: $showEmergencyConfirm) {
+            Button("取消", role: .cancel) { }
+            Button("確認解鎖", role: .destructive) { emergencyUnlock() }
+        } message: {
+            Text("會直接結束鎖定,並把這次紀錄到統計裡。\n建議只在真的有急事時使用。")
         }
     }
 
@@ -417,6 +435,14 @@ struct UnlockFlowView: View {
         startCooldown()
     }
     private func finish() {
+        app.lockSession.unlock()
+        app.quizUnlockCount += 1
+        Task { await ScreenTimeService.shared.stopShield() }
+        app.route = .main
+    }
+    private func emergencyUnlock() {
+        cooldownTimer?.invalidate(); cooldownTimer = nil
+        app.emergencyUnlockCount += 1
         app.lockSession.unlock()
         Task { await ScreenTimeService.shared.stopShield() }
         app.route = .main

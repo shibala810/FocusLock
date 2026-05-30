@@ -63,8 +63,7 @@ struct ScheduleEditorView: View {
                                         Text(WEEK_LABELS[i])
                                             .font(.system(size: 15, weight: .heavy))
                                             .foregroundStyle(on ? .white : fl.inkFaint)
-                                            .frame(maxWidth: .infinity)
-                                            .aspectRatio(1, contentMode: .fit)
+                                            .frame(width: 38, height: 38)
                                             .background(
                                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                                                     .fill(on ? fl.primary : fl.surface)
@@ -73,6 +72,7 @@ struct ScheduleEditorView: View {
                                                     radius: on ? 6 : 5, y: on ? 5 : 3)
                                     }
                                     .buttonStyle(.plain)
+                                    .frame(maxWidth: .infinity)
                                 }
                             }
                         }

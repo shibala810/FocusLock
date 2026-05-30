@@ -122,6 +122,7 @@ struct WelcomeScreen: View {
 
     private func requestAuth() async {
         await ScreenTimeService.shared.requestAuthorization()
+        await NotificationService.shared.requestAuthorization()
         app.route = .main
     }
 }

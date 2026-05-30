@@ -45,8 +45,8 @@ struct HomeScreen: View {
             }
             Spacer()
             if app.mascotEnabled {
-                Cat(size: 60, mood: locked ? .study : .happy)
-                    .offset(y: -6)
+                Cat(size: 76, mood: locked ? .study : .happy)
+                    .offset(y: -4)
                     .flBreathe(duration: 4)
             }
         }

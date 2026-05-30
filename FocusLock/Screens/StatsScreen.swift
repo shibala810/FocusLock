@@ -70,6 +70,16 @@ struct StatsScreen: View {
                                 .opacity(0.9)
                         }
 
+                        // unlock counters
+                        HStack(spacing: 12) {
+                            MiniStat(icon: { LineIcon(name: .check, size: 16, color: fl.focus) },
+                                     label: "答題解鎖", value: "\(app.quizUnlockCount) 次",
+                                     tint: fl.focus)
+                            MiniStat(icon: { LineIcon(name: .siren, size: 16, color: fl.danger) },
+                                     label: "緊急解鎖", value: "\(app.emergencyUnlockCount) 次",
+                                     tint: fl.danger)
+                        }
+
                         // weekly bar chart
                         FLCard(cornerRadius: 24) {
                             VStack(alignment: .leading, spacing: 16) {

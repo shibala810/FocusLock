@@ -33,7 +33,7 @@ final class AppState {
     let bank = QuestionBank()
 
     var schedules: [Schedule] {
-        didSet { persistSchedules() }
+        didSet { persistSchedules(); rebuildNotifications() }
     }
     var unlockSettings: UnlockSettings {
         didSet { persistSettings() }
@@ -46,6 +46,24 @@ final class AppState {
     }
     var spinAnimationEnabled: Bool {
         didSet { UserDefaults.standard.set(spinAnimationEnabled, forKey: "spin") }
+    }
+    var notificationsEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(notificationsEnabled, forKey: "notifs")
+            rebuildNotifications()
+        }
+    }
+    var notifyMinutesBefore: Int {
+        didSet {
+            UserDefaults.standard.set(notifyMinutesBefore, forKey: "notifsLead")
+            rebuildNotifications()
+        }
+    }
+    var emergencyUnlockCount: Int {
+        didSet { UserDefaults.standard.set(emergencyUnlockCount, forKey: "emergencyCount") }
+    }
+    var quizUnlockCount: Int {
+        didSet { UserDefaults.standard.set(quizUnlockCount, forKey: "quizUnlockCount") }
     }
     var editingSchedule: Schedule? = nil
     var catalog: [CatalogCategory]
@@ -68,6 +86,10 @@ final class AppState {
         }
         self.mascotEnabled = d.object(forKey: "mascot") as? Bool ?? true
         self.spinAnimationEnabled = d.object(forKey: "spin") as? Bool ?? true
+        self.notificationsEnabled = d.object(forKey: "notifs") as? Bool ?? true
+        self.notifyMinutesBefore = d.object(forKey: "notifsLead") as? Int ?? 5
+        self.emergencyUnlockCount = d.integer(forKey: "emergencyCount")
+        self.quizUnlockCount = d.integer(forKey: "quizUnlockCount")
 
         if let data = d.data(forKey: "schedules"),
            let arr = try? JSONDecoder().decode([Schedule].self, from: data) {
@@ -95,6 +117,12 @@ final class AppState {
         if let data = try? JSONEncoder().encode(schedules) {
             UserDefaults.standard.set(data, forKey: "schedules")
         }
+    }
+    private func rebuildNotifications() {
+        let snap = schedules
+        let lead = notifyMinutesBefore
+        let on = notificationsEnabled
+        Task { await NotificationService.shared.rebuild(schedules: snap, leadMinutes: lead, enabled: on) }
     }
     private func persistSettings() {
         if let data = try? JSONEncoder().encode(unlockSettings) {

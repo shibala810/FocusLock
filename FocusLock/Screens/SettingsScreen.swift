@@ -100,10 +100,31 @@ struct SettingsScreen: View {
                                   iconBg: fl.dangerSoft,
                                   right: { LineIcon(name: .chevron, size: 18, color: fl.inkFaint) },
                                   onTap: { app.route = .block })
-                            FLRow(title: "提醒通知", sub: "排程開始前提醒",
+                            FLRow(title: "排程提醒", sub: "啟用後會在排程開始前推播",
                                   icon: { LineIcon(name: .bell, size: 20, color: fl.amber) },
                                   iconBg: fl.amberSoft,
-                                  right: { FLToggle(isOn: .constant(true), color: fl.amber) })
+                                  right: {
+                                FLToggle(isOn: Binding(
+                                    get: { app.notificationsEnabled },
+                                    set: { newVal in
+                                        app.notificationsEnabled = newVal
+                                        if newVal {
+                                            Task { await NotificationService.shared.requestAuthorization() }
+                                        }
+                                    }
+                                ), color: fl.amber)
+                            })
+                            if app.notificationsEnabled {
+                                FLRow(title: "提前提醒", sub: "排程開始前的提醒時間",
+                                      icon: { LineIcon(name: .clock, size: 20, color: fl.amber) },
+                                      iconBg: fl.amberSoft,
+                                      right: {
+                                    FLStepper(value: Binding(
+                                        get: { app.notifyMinutesBefore },
+                                        set: { app.notifyMinutesBefore = $0 }
+                                    ), range: 1...60, suffix: " 分")
+                                })
+                            }
                             FLRow(title: "關於 FocusLock", sub: "版本 1.0 ・ 麻糬出品",
                                   icon: { LineIcon(name: .info, size: 20, color: fl.inkSoft) },
                                   right: { LineIcon(name: .chevron, size: 18, color: fl.inkFaint) },
