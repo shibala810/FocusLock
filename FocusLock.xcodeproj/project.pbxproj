@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		689CCD142FCAAC720096E34A /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689CCD132FCAAC720096E34A /* DeviceActivity.framework */; };
+		689CCD1C2FCAAC720096E34A /* FocusLockMonitor.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 689CCD112FCAAC720096E34A /* FocusLockMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		689CCC862FCA9B290096E34A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +26,35 @@
 			remoteGlobalIDString = 689CCC752FCA9B260096E34A;
 			remoteInfo = FocusLock;
 		};
+		689CCD1A2FCAAC720096E34A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 689CCC6E2FCA9B260096E34A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 689CCD102FCAAC720096E34A;
+			remoteInfo = FocusLockMonitor;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		689CCD212FCAAC720096E34A /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Extensions;
+			dstSubfolderSpec = 1;
+			files = (
+				689CCD1C2FCAAC720096E34A /* FocusLockMonitor.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		689CCC762FCA9B260096E34A /* FocusLock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		689CCC852FCA9B290096E34A /* FocusLockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusLockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		689CCC8F2FCA9B290096E34A /* FocusLockUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusLockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		689CCD112FCAAC720096E34A /* FocusLockMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusLockMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		689CCD132FCAAC720096E34A /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +64,13 @@
 				Info.plist,
 			);
 			target = 689CCC752FCA9B260096E34A /* FocusLock */;
+		};
+		689CCD202FCAAC720096E34A /* Exceptions for "FocusLockMonitor" folder in "FocusLockMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 689CCD102FCAAC720096E34A /* FocusLockMonitor */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -56,6 +91,14 @@
 		689CCC922FCA9B290096E34A /* FocusLockUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FocusLockUITests;
+			sourceTree = "<group>";
+		};
+		689CCD152FCAAC720096E34A /* FocusLockMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				689CCD202FCAAC720096E34A /* Exceptions for "FocusLockMonitor" folder in "FocusLockMonitor" target */,
+			);
+			path = FocusLockMonitor;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -82,6 +125,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		689CCD0E2FCAAC720096E34A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				689CCD142FCAAC720096E34A /* DeviceActivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -91,6 +142,8 @@
 				689CCC782FCA9B260096E34A /* FocusLock */,
 				689CCC882FCA9B290096E34A /* FocusLockTests */,
 				689CCC922FCA9B290096E34A /* FocusLockUITests */,
+				689CCD152FCAAC720096E34A /* FocusLockMonitor */,
+				689CCD122FCAAC720096E34A /* Frameworks */,
 				689CCC772FCA9B260096E34A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,8 +154,17 @@
 				689CCC762FCA9B260096E34A /* FocusLock.app */,
 				689CCC852FCA9B290096E34A /* FocusLockTests.xctest */,
 				689CCC8F2FCA9B290096E34A /* FocusLockUITests.xctest */,
+				689CCD112FCAAC720096E34A /* FocusLockMonitor.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		689CCD122FCAAC720096E34A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				689CCD132FCAAC720096E34A /* DeviceActivity.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -115,10 +177,12 @@
 				689CCC722FCA9B260096E34A /* Sources */,
 				689CCC732FCA9B260096E34A /* Frameworks */,
 				689CCC742FCA9B260096E34A /* Resources */,
+				689CCD212FCAAC720096E34A /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				689CCD1B2FCAAC720096E34A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				689CCC782FCA9B260096E34A /* FocusLock */,
@@ -176,6 +240,28 @@
 			productReference = 689CCC8F2FCA9B290096E34A /* FocusLockUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		689CCD102FCAAC720096E34A /* FocusLockMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 689CCD1D2FCAAC720096E34A /* Build configuration list for PBXNativeTarget "FocusLockMonitor" */;
+			buildPhases = (
+				689CCD0D2FCAAC720096E34A /* Sources */,
+				689CCD0E2FCAAC720096E34A /* Frameworks */,
+				689CCD0F2FCAAC720096E34A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				689CCD152FCAAC720096E34A /* FocusLockMonitor */,
+			);
+			name = FocusLockMonitor;
+			packageProductDependencies = (
+			);
+			productName = FocusLockMonitor;
+			productReference = 689CCD112FCAAC720096E34A /* FocusLockMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -197,6 +283,9 @@
 						CreatedOnToolsVersion = 26.2;
 						TestTargetID = 689CCC752FCA9B260096E34A;
 					};
+					689CCD102FCAAC720096E34A = {
+						CreatedOnToolsVersion = 26.2;
+					};
 				};
 			};
 			buildConfigurationList = 689CCC712FCA9B260096E34A /* Build configuration list for PBXProject "FocusLock" */;
@@ -216,6 +305,7 @@
 				689CCC752FCA9B260096E34A /* FocusLock */,
 				689CCC842FCA9B290096E34A /* FocusLockTests */,
 				689CCC8E2FCA9B290096E34A /* FocusLockUITests */,
+				689CCD102FCAAC720096E34A /* FocusLockMonitor */,
 			);
 		};
 /* End PBXProject section */
@@ -236,6 +326,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		689CCC8D2FCA9B290096E34A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		689CCD0F2FCAAC720096E34A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -266,6 +363,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		689CCD0D2FCAAC720096E34A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -278,6 +382,11 @@
 			isa = PBXTargetDependency;
 			target = 689CCC752FCA9B260096E34A /* FocusLock */;
 			targetProxy = 689CCC902FCA9B290096E34A /* PBXContainerItemProxy */;
+		};
+		689CCD1B2FCAAC720096E34A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 689CCD102FCAAC720096E34A /* FocusLockMonitor */;
+			targetProxy = 689CCD1A2FCAAC720096E34A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -555,6 +664,66 @@
 			};
 			name = Release;
 		};
+		689CCD1E2FCAAC720096E34A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusLockMonitor/FocusLockMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S6BKKMZ8Q2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusLockMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusLockMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shibala810.FocusLock.FocusLockMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		689CCD1F2FCAAC720096E34A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusLockMonitor/FocusLockMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S6BKKMZ8Q2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusLockMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusLockMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shibala810.FocusLock.FocusLockMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -590,6 +759,15 @@
 			buildConfigurations = (
 				689CCCA02FCA9B290096E34A /* Debug */,
 				689CCCA12FCA9B290096E34A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		689CCD1D2FCAAC720096E34A /* Build configuration list for PBXNativeTarget "FocusLockMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				689CCD1E2FCAAC720096E34A /* Debug */,
+				689CCD1F2FCAAC720096E34A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
