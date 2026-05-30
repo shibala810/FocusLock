@@ -118,14 +118,18 @@ struct HomeScreen: View {
                 .padding(.horizontal, 28)
 
             Button { app.route = .unlock } label: {
-                HStack {
+                HStack(spacing: 8) {
                     LineIcon(name: .unlock, size: 20, color: fl.amber)
                     Text("我要提前解鎖").foregroundStyle(fl.amber)
                 }
                 .font(.system(size: 16, weight: .heavy))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .padding(.horizontal, 28)
+                .background(Capsule().fill(fl.surface))
+                .modifier(FLShadow.cardSmall(fl))
             }
-            .buttonStyle(FLPillStyle(background: fl.surface, foreground: fl.amber,
-                                     padding: .init(top: 16, leading: 0, bottom: 16, trailing: 0)))
+            .buttonStyle(.plain)
             .padding(.horizontal, 22)
         }
     }

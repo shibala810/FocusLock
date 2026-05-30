@@ -7,8 +7,17 @@ import SwiftUI
 struct SettingsScreen: View {
     @Environment(AppState.self) private var app
     @Environment(\.fl) private var fl
+    @State private var showProfileEditor = false
 
     private let allSubjects = Subject.allCases
+
+    private var profileSubtitle: String {
+        let school = app.targetSchool.isEmpty ? "尚未設定目標" : "目標:\(app.targetSchool)"
+        if let days = app.daysUntilExam {
+            return "\(school) · 倒數 \(days) 天"
+        }
+        return "\(school) · 尚未設定考試日"
+    }
 
     var body: some View {
         @Bindable var bApp = app
@@ -19,28 +28,34 @@ struct SettingsScreen: View {
                     TopBar(title: "設定", sub: "把規則調成你的樣子")
 
                     VStack(spacing: 22) {
-                        // profile
-                        FLCard(cornerRadius: 26) {
-                            HStack(spacing: 15) {
-                                ZStack(alignment: .bottomTrailing) {
-                                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                        .fill(fl.primarySoft)
-                                        .frame(width: 64, height: 64)
-                                        .overlay(Cat(size: 56, mood: .happy))
-                                    Volleyball(size: 26)
-                                        .offset(x: 4, y: 4)
+                        // profile (tap to edit)
+                        Button { showProfileEditor = true } label: {
+                            FLCard(cornerRadius: 26) {
+                                HStack(spacing: 15) {
+                                    ZStack(alignment: .bottomTrailing) {
+                                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                            .fill(fl.primarySoft)
+                                            .frame(width: 64, height: 64)
+                                            .overlay(Cat(size: 56, mood: .happy))
+                                        Volleyball(size: 26)
+                                            .offset(x: 4, y: 4)
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("準考生・\(app.userName)")
+                                            .font(.system(size: 18, weight: .heavy))
+                                            .foregroundStyle(fl.ink)
+                                        Text(profileSubtitle)
+                                            .font(.system(size: 13))
+                                            .foregroundStyle(fl.inkSoft)
+                                            .lineLimit(2)
+                                    }
+                                    Spacer(minLength: 4)
+                                    LineIcon(name: .chevron, size: 16, color: fl.inkFaint)
                                 }
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("準考生・小晴")
-                                        .font(.system(size: 18, weight: .heavy))
-                                    Text("目標:台灣大學 · 倒數 248 天")
-                                        .font(.system(size: 13))
-                                        .foregroundStyle(fl.inkSoft)
-                                }
-                                Spacer()
+                                .padding(18)
                             }
-                            .padding(18)
                         }
+                        .buttonStyle(.plain)
 
                         // appearance
                         FLGroup(header: "外觀") {
@@ -150,6 +165,34 @@ struct SettingsScreen: View {
                 }
             }
         }
+        .sheet(isPresented: $showProfileEditor) {
+            ProfileEditorSheet(
+                name: app.userName,
+                school: app.targetSchool,
+                date: app.examDate ?? defaultExamDate(),
+                hasDate: app.examDate != nil,
+                onCancel: { showProfileEditor = false },
+                onSave: { newName, newSchool, newDate, dateOn in
+                    app.userName = newName.isEmpty ? "考生" : newName
+                    app.targetSchool = newSchool
+                    app.examDate = dateOn ? newDate : nil
+                    showProfileEditor = false
+                }
+            )
+        }
+    }
+
+    private func defaultExamDate() -> Date {
+        // Default to next July 1 (台灣大學考分發放榜大約落在 7 月初)
+        let cal = Calendar.current
+        let now = Date()
+        var comps = cal.dateComponents([.year], from: now)
+        comps.month = 7
+        comps.day = 1
+        let thisYear = cal.date(from: comps) ?? now
+        if thisYear > now { return thisYear }
+        comps.year = (comps.year ?? cal.component(.year, from: now)) + 1
+        return cal.date(from: comps) ?? now
     }
 
     @ViewBuilder
@@ -189,5 +232,104 @@ struct SettingsScreen: View {
             .modifier(FLShadow.cardSmall(fl))
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Profile editor sheet
+
+struct ProfileEditorSheet: View {
+    @State var name: String
+    @State var school: String
+    @State var date: Date
+    @State var hasDate: Bool
+    var onCancel: () -> Void
+    var onSave: (_ name: String, _ school: String, _ date: Date, _ dateOn: Bool) -> Void
+
+    @Environment(\.fl) private var fl
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button("取消") { onCancel() }
+                    .foregroundStyle(fl.inkSoft)
+                    .font(.system(size: 16, weight: .heavy))
+                Spacer()
+                Text("編輯個人資料")
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(fl.ink)
+                Spacer()
+                Button("儲存") { onSave(name, school, date, hasDate) }
+                    .foregroundStyle(fl.primaryDeep)
+                    .font(.system(size: 16, weight: .heavy))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+
+            Divider().background(fl.hairline)
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    field(label: "名字", placeholder: "輸入你的名字", text: $name)
+                    field(label: "目標學校", placeholder: "例如:台灣大學", text: $school)
+
+                    FLCard(cornerRadius: 18, smallShadow: true) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Text("考試日期")
+                                    .font(.system(size: 13, weight: .heavy))
+                                    .foregroundStyle(fl.inkSoft)
+                                Spacer()
+                                FLToggle(isOn: $hasDate, color: fl.primary)
+                            }
+                            if hasDate {
+                                DatePicker("", selection: $date, in: Date()...,
+                                           displayedComponents: [.date])
+                                    .datePickerStyle(.graphical)
+                                    .labelsHidden()
+                                    .tint(fl.primaryDeep)
+                                Text("距離考試 \(daysAway()) 天")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(fl.primaryDeep)
+                            } else {
+                                Text("關閉後不顯示倒數")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(fl.inkFaint)
+                            }
+                        }
+                        .padding(16)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 28)
+            }
+        }
+        .background(fl.bg)
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+    }
+
+    @ViewBuilder
+    private func field(label: String, placeholder: String, text: Binding<String>) -> some View {
+        FLCard(cornerRadius: 18, smallShadow: true) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(label)
+                    .font(.system(size: 12.5, weight: .heavy))
+                    .foregroundStyle(fl.inkSoft)
+                TextField(placeholder, text: text)
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(fl.ink)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            }
+            .padding(14)
+        }
+    }
+
+    private func daysAway() -> Int {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let target = cal.startOfDay(for: date)
+        return max(0, cal.dateComponents([.day], from: today, to: target).day ?? 0)
     }
 }

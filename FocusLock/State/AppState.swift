@@ -65,6 +65,31 @@ final class AppState {
     var quizUnlockCount: Int {
         didSet { UserDefaults.standard.set(quizUnlockCount, forKey: "quizUnlockCount") }
     }
+    var userName: String {
+        didSet { UserDefaults.standard.set(userName, forKey: "userName") }
+    }
+    var targetSchool: String {
+        didSet { UserDefaults.standard.set(targetSchool, forKey: "targetSchool") }
+    }
+    /// Target exam date. `nil` hides the countdown row.
+    var examDate: Date? {
+        didSet {
+            if let d = examDate {
+                UserDefaults.standard.set(d, forKey: "examDate")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "examDate")
+            }
+        }
+    }
+    /// Days from today until examDate. Returns nil if no date set, 0 if in the past.
+    var daysUntilExam: Int? {
+        guard let exam = examDate else { return nil }
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let target = cal.startOfDay(for: exam)
+        let comps = cal.dateComponents([.day], from: today, to: target)
+        return max(0, comps.day ?? 0)
+    }
     var editingSchedule: Schedule? = nil
     var catalog: [CatalogCategory]
     let log = FocusLogStore.shared
@@ -82,6 +107,7 @@ final class AppState {
         if UserDefaults.standard.bool(forKey: "FL_WIPE") {
             FocusLogStore.shared.clear()
         }
+        let lockArg = UserDefaults.standard.integer(forKey: "FL_LOCK_MINUTES")
         #endif
         // load persisted bits
         let d = UserDefaults.standard
@@ -96,6 +122,9 @@ final class AppState {
         self.notifyMinutesBefore = d.object(forKey: "notifsLead") as? Int ?? 5
         self.emergencyUnlockCount = d.integer(forKey: "emergencyCount")
         self.quizUnlockCount = d.integer(forKey: "quizUnlockCount")
+        self.userName = d.string(forKey: "userName") ?? "考生"
+        self.targetSchool = d.string(forKey: "targetSchool") ?? "理想大學"
+        self.examDate = d.object(forKey: "examDate") as? Date
 
         if let data = d.data(forKey: "schedules"),
            let arr = try? JSONDecoder().decode([Schedule].self, from: data) {
@@ -110,6 +139,12 @@ final class AppState {
             self.unlockSettings = .default
         }
         self.catalog = CatalogCategory.samples
+
+        #if DEBUG
+        if lockArg > 0 {
+            lockSession.lock(forMinutes: lockArg)
+        }
+        #endif
     }
 
     var blockCount: Int {
