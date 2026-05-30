@@ -8,6 +8,30 @@ struct StatsScreen: View {
     @Environment(AppState.self) private var app
     @Environment(\.fl) private var fl
 
+    @ViewBuilder
+    private var emptyStateCard: some View {
+        FLCard(cornerRadius: 22, smallShadow: true) {
+            HStack(spacing: 13) {
+                if app.mascotEnabled {
+                    Cat(size: 56, mood: .happy)
+                } else {
+                    LineIcon(name: .flame, size: 32, color: fl.amber)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("還沒開始累積")
+                        .font(.system(size: 14.5, weight: .heavy))
+                        .foregroundStyle(fl.ink)
+                    Text("先在首頁按一次「立即鎖定」,\n之後這頁就會慢慢長起來。")
+                        .font(.system(size: 12.5))
+                        .foregroundStyle(fl.inkSoft)
+                        .lineSpacing(3)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+        }
+    }
+
     private var cheerSuffix: String {
         let school = app.targetSchool.trimmingCharacters(in: .whitespacesAndNewlines)
         return school.isEmpty
@@ -16,6 +40,7 @@ struct StatsScreen: View {
     }
 
     var body: some View {
+        let empty = app.log.sessions.isEmpty
         let week = app.weekFocus
         let weekTotal = week.reduce(0) { $0 + $1.minutes }
         let hours = weekTotal / 60; let mins = weekTotal % 60
@@ -35,6 +60,12 @@ struct StatsScreen: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     TopBar(title: "戰績", sub: "本週計分板")
+
+                    if empty {
+                        emptyStateCard
+                            .padding(.horizontal, 22)
+                            .padding(.top, 8)
+                    }
 
                     VStack(spacing: 16) {
                         // scoreboard hero

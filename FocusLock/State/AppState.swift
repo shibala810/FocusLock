@@ -22,10 +22,11 @@ enum AppTheme: String, CaseIterable, Codable {
 @Observable
 final class AppState {
     #if DEBUG
-    var route: AppRoute = UserDefaults.standard.string(forKey: "FL_ROUTE").flatMap(routeFromString) ?? .welcome
+    var route: AppRoute = UserDefaults.standard.string(forKey: "FL_ROUTE").flatMap(routeFromString)
+        ?? (UserDefaults.standard.bool(forKey: "welcomeShown") ? .main : .welcome)
     var tab: MainTab = UserDefaults.standard.string(forKey: "FL_TAB").flatMap(tabFromString) ?? .home
     #else
-    var route: AppRoute = .welcome
+    var route: AppRoute = UserDefaults.standard.bool(forKey: "welcomeShown") ? .main : .welcome
     var tab: MainTab = .home
     #endif
 
@@ -72,6 +73,11 @@ final class AppState {
         didSet { UserDefaults.standard.set(targetSchool, forKey: "targetSchool") }
     }
     /// Target exam date. `nil` hides the countdown row.
+    /// True once the user has finished the welcome onboarding at least once;
+    /// future launches skip straight to .main.
+    var welcomeShown: Bool {
+        didSet { UserDefaults.standard.set(welcomeShown, forKey: "welcomeShown") }
+    }
     var examDate: Date? {
         didSet {
             if let d = examDate {
@@ -125,6 +131,7 @@ final class AppState {
         self.userName = d.string(forKey: "userName") ?? "考生"
         self.targetSchool = d.string(forKey: "targetSchool") ?? "理想大學"
         self.examDate = d.object(forKey: "examDate") as? Date
+        self.welcomeShown = d.bool(forKey: "welcomeShown")
 
         if let data = d.data(forKey: "schedules"),
            let arr = try? JSONDecoder().decode([Schedule].self, from: data) {

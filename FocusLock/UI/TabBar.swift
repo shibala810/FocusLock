@@ -61,6 +61,7 @@ struct TabBar: View {
             LinearGradient(colors: [.clear, fl.bg],
                            startPoint: .top, endPoint: .center)
         )
+        .iPadContentWidth(560)
         .frame(maxHeight: .infinity, alignment: .bottom)
     }
 }

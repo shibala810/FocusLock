@@ -21,6 +21,7 @@ struct FLScreen<Content: View>: View {
             .ignoresSafeArea()
 
             content()
+                .iPadContentWidth()
         }
     }
 }
