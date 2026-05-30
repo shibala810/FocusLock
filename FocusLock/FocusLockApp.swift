@@ -2,31 +2,18 @@
 //  FocusLockApp.swift
 //  FocusLock
 //
-//  Created by timwu on 2026/5/30.
-//
 
 import SwiftUI
-import SwiftData
 
 @main
 struct FocusLockApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @State private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(appState)
+                .preferredColorScheme(appState.theme.colorScheme)
         }
-        .modelContainer(sharedModelContainer)
     }
 }

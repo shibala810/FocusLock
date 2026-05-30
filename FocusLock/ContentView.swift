@@ -1,61 +1,68 @@
 //
-//  ContentView.swift
+//  ContentView.swift  (RootView)
 //  FocusLock
-//
-//  Created by timwu on 2026/5/30.
 //
 
 import SwiftUI
-import SwiftData
 
-struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+struct RootView: View {
+    @Environment(AppState.self) private var app
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+        ZStack {
+            switch app.route {
+            case .welcome:
+                WelcomeScreen()
+                    .transition(.opacity)
+            case .main:
+                MainTabs()
+                    .transition(.opacity)
+            case .block:
+                BlockScreen()
+                    .transition(.move(edge: .trailing))
+            case .editSchedule:
+                ScheduleEditorView()
+                    .transition(.move(edge: .trailing))
+            case .unlock:
+                UnlockFlowView()
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: 0.28), value: app.route)
+        .flTheme()
     }
 }
 
+struct MainTabs: View {
+    @Environment(AppState.self) private var app
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            // current screen
+            Group {
+                switch app.tab {
+                case .home:     HomeScreen()
+                case .schedule: ScheduleScreen()
+                case .stats:    StatsScreen()
+                case .settings: SettingsScreen()
+                }
+            }
+            .id(app.tab)
+            .transition(.opacity)
+
+            if !(app.tab == .home && app.lockSession.state == .locked) {
+                TabBar()
+            }
+        }
+        .animation(.easeInOut(duration: 0.22), value: app.tab)
+    }
+}
+
+// Keep ContentView around as a thin alias for backward-compat with Xcode previews.
+struct ContentView: View {
+    var body: some View { RootView() }
+}
+
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    RootView().environment(AppState.preview)
 }
