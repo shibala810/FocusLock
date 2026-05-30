@@ -79,46 +79,46 @@ struct HomeScreen: View {
     @ViewBuilder
     private var lockedBody: some View {
         VStack(spacing: 0) {
-            ZStack {
-                Blob(color: fl.surface2)
-                    .frame(maxWidth: .infinity, maxHeight: 240)
-                    .padding(.horizontal, 18)
-                VStack(spacing: 10) {
-                    ZStack {
-                        Volleyball(size: 210, spin: app.spinAnimationEnabled)
-                            .flBreathe(duration: 5)
-                        VStack(spacing: 2) {
-                            Text(LockSession.fmt(app.lockSession.remainingSeconds))
-                                .font(.system(size: 36, weight: .heavy).monospacedDigit())
-                                .foregroundStyle(fl.ballDark)
-                            Text("剩餘鎖定")
-                                .font(.system(size: 12.5, weight: .heavy))
-                                .tracking(2)
-                                .foregroundStyle(fl.ballDark.opacity(0.7))
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .fill(fl.ballCream)
-                                .shadow(color: fl.ballDark.opacity(0.18), radius: 8, y: 4)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .strokeBorder(fl.ballDark.opacity(0.10), lineWidth: 1)
-                        )
-                    }
-                    HStack(spacing: 7) {
-                        LineIcon(name: .shield, size: 16, color: fl.focus)
-                        Text("已封鎖 \(app.blockCount) 個 App・心無旁騖")
-                            .font(.system(size: 13.5, weight: .heavy))
-                            .foregroundStyle(fl.focus)
-                    }
-                    .padding(.horizontal, 15).padding(.vertical, 7)
-                    .background(Capsule().fill(fl.focusSoft))
+            VStack(spacing: 18) {
+                // Volleyball, breathing on its own backdrop blob.
+                ZStack {
+                    Blob(color: fl.surface2)
+                        .frame(width: 240, height: 240)
+                    Volleyball(size: 180, spin: app.spinAnimationEnabled)
+                        .flBreathe(duration: 5)
                 }
-                .padding(.vertical, 20)
+                .padding(.top, 4)
+
+                // Timer card — fully separate, easy to read.
+                VStack(spacing: 6) {
+                    Text(LockSession.fmt(app.lockSession.remainingSeconds))
+                        .font(.system(size: 48, weight: .heavy).monospacedDigit())
+                        .foregroundStyle(fl.ink)
+                        .kerning(1.2)
+                    Text("剩餘鎖定")
+                        .font(.system(size: 12.5, weight: .heavy))
+                        .tracking(3)
+                        .foregroundStyle(fl.inkSoft)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+                .background(
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .fill(fl.surface)
+                )
+                .modifier(FLShadow.cardSmall(fl))
+                .padding(.horizontal, 22)
+
+                HStack(spacing: 7) {
+                    LineIcon(name: .shield, size: 16, color: fl.focus)
+                    Text("已封鎖 \(app.blockCount) 個 App・心無旁騖")
+                        .font(.system(size: 13.5, weight: .heavy))
+                        .foregroundStyle(fl.focus)
+                }
+                .padding(.horizontal, 15).padding(.vertical, 7)
+                .background(Capsule().fill(fl.focusSoft))
             }
+            .padding(.top, 8)
 
             Text("娛樂 App 現在打不開囉。\n真的有需要,可以答題提前解鎖。")
                 .font(.system(size: 14))
