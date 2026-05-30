@@ -435,7 +435,7 @@ struct UnlockFlowView: View {
         startCooldown()
     }
     private func finish() {
-        app.lockSession.unlock()
+        app.lockSession.unlock(reason: .quizUnlocked)
         app.quizUnlockCount += 1
         Task { await ScreenTimeService.shared.stopShield() }
         app.route = .main
@@ -443,7 +443,7 @@ struct UnlockFlowView: View {
     private func emergencyUnlock() {
         cooldownTimer?.invalidate(); cooldownTimer = nil
         app.emergencyUnlockCount += 1
-        app.lockSession.unlock()
+        app.lockSession.unlock(reason: .emergency)
         Task { await ScreenTimeService.shared.stopShield() }
         app.route = .main
     }

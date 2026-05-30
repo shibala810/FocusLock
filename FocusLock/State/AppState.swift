@@ -67,16 +67,22 @@ final class AppState {
     }
     var editingSchedule: Schedule? = nil
     var catalog: [CatalogCategory]
+    let log = FocusLogStore.shared
 
-    // Stats — light-weight in-memory snapshot for v1
-    var todayFocusMinutes: Int = 165
-    var streak: Int = 12
-    var weekFocus: [(day: String, minutes: Int)] = [
-        ("一", 165), ("二", 190), ("三", 120), ("四", 210),
-        ("五", 175), ("六",  95), ("日", 140),
-    ]
+    // Stats — derived from FocusLogStore.
+    var todayFocusMinutes: Int { log.minutes(on: Date()) }
+    var streak: Int { log.streak() }
+    var weekFocus: [(day: String, minutes: Int)] { log.lastSevenDays() }
 
     init() {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "FL_SEED") {
+            FocusLogStore.shared.seedDemo()
+        }
+        if UserDefaults.standard.bool(forKey: "FL_WIPE") {
+            FocusLogStore.shared.clear()
+        }
+        #endif
         // load persisted bits
         let d = UserDefaults.standard
         if let raw = d.string(forKey: "theme"), let t = AppTheme(rawValue: raw) {

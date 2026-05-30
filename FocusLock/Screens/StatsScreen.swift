@@ -9,13 +9,19 @@ struct StatsScreen: View {
     @Environment(\.fl) private var fl
 
     var body: some View {
-        let weekTotal = app.weekFocus.reduce(0) { $0 + $1.minutes }
+        let week = app.weekFocus
+        let weekTotal = week.reduce(0) { $0 + $1.minutes }
         let hours = weekTotal / 60; let mins = weekTotal % 60
-        let maxMin = max(1, app.weekFocus.map(\.minutes).max() ?? 1)
+        let maxMin = max(1, week.map(\.minutes).max() ?? 1)
+        let blocked = app.log.successfulDays()
+
+        // Mastery from log: rolling % over completed quiz attempts.
+        // For v1, since we don't yet track per-question correctness in the
+        // log, derive a simple mock per subject only when there's nothing
+        // to show; once real per-attempt logging lands this becomes real.
         let mastery: [(Subject, Double)] = [
             (.math, 0.82), (.english, 0.91), (.chinese, 0.68), (.history, 0.75)
         ]
-        let blocked = 41
 
         FLScreen {
             PawField()
