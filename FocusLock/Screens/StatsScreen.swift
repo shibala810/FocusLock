@@ -47,13 +47,10 @@ struct StatsScreen: View {
         let maxMin = max(1, week.map(\.minutes).max() ?? 1)
         let blocked = app.log.successfulDays()
 
-        // Mastery from log: rolling % over completed quiz attempts.
-        // For v1, since we don't yet track per-question correctness in the
-        // log, derive a simple mock per subject only when there's nothing
-        // to show; once real per-attempt logging lands this becomes real.
-        let mastery: [(Subject, Double)] = [
-            (.math, 0.82), (.english, 0.91), (.chinese, 0.68), (.history, 0.75)
-        ]
+        // Mastery from real per-attempt log: correct / total.
+        // Subjects the user has never attempted return nil → show "—".
+        let masteryDict = app.log.mastery()
+        let mastery: [(Subject, Double?)] = Subject.allCases.map { ($0, masteryDict[$0]) }
 
         FLScreen {
             PawField()
@@ -171,21 +168,31 @@ struct StatsScreen: View {
                                 VStack(spacing: 0) {
                                     ForEach(mastery.indices, id: \.self) { i in
                                         let (sub, rate) = mastery[i]
+                                        let n = app.log.attemptCount(for: sub)
                                         HStack(spacing: 13) {
                                             SubjectIcon(subject: sub, size: 36)
                                             VStack(alignment: .leading, spacing: 6) {
                                                 HStack {
                                                     Text(sub.rawValue)
                                                         .font(.system(size: 14.5, weight: .heavy))
+                                                    Text("(\(n) 題)")
+                                                        .font(.system(size: 12).monospacedDigit())
+                                                        .foregroundStyle(fl.inkFaint)
                                                     Spacer()
-                                                    Text("\(Int(rate * 100))%")
-                                                        .font(.system(size: 14.5, weight: .heavy).monospacedDigit())
-                                                        .foregroundStyle(fl.focus)
+                                                    if let r = rate {
+                                                        Text("\(Int(r * 100))%")
+                                                            .font(.system(size: 14.5, weight: .heavy).monospacedDigit())
+                                                            .foregroundStyle(fl.focus)
+                                                    } else {
+                                                        Text("—")
+                                                            .font(.system(size: 14.5, weight: .heavy))
+                                                            .foregroundStyle(fl.inkFaint)
+                                                    }
                                                 }
                                                 ZStack(alignment: .leading) {
                                                     Capsule().fill(fl.surface3).frame(height: 7)
                                                     Capsule().fill(fl.focus)
-                                                        .frame(width: 230 * rate, height: 7)
+                                                        .frame(width: 230 * (rate ?? 0), height: 7)
                                                 }
                                             }
                                         }

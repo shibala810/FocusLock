@@ -446,6 +446,11 @@ struct UnlockFlowView: View {
         picked = i
         reveal = true
         let ok = (i == q.answerIndex)
+        app.log.recordAttempt(QuizAttempt(
+            attemptedAt: Date(),
+            questionId: q.id,
+            subject: q.subject,
+            correct: ok))
         let newCorrect = correct + (ok ? 1 : 0)
         DispatchQueue.main.asyncAfter(deadline: .now() + (ok ? 0.75 : 1.5)) {
             correct = newCorrect

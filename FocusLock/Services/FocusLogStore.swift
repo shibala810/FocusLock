@@ -12,8 +12,10 @@ final class FocusLogStore {
     static let shared = FocusLogStore()
 
     private(set) var sessions: [FocusSession] = []
+    private(set) var attempts: [QuizAttempt] = []
 
     private let key = "focusLog"
+    private let attemptsKey = "quizAttempts"
     private var defaults: UserDefaults { SharedStorage.defaults }
 
     init() { load() }
@@ -27,23 +29,59 @@ final class FocusLogStore {
         persist()
     }
 
+    func recordAttempt(_ a: QuizAttempt) {
+        attempts.append(a)
+        if attempts.count > 5000 { attempts.removeFirst(attempts.count - 5000) }
+        persistAttempts()
+    }
+
     func clear() {
         sessions.removeAll()
+        attempts.removeAll()
         persist()
+        persistAttempts()
     }
 
     // MARK: - Persistence
 
     private func load() {
-        guard let data = defaults.data(forKey: key),
-              let arr = try? JSONDecoder().decode([FocusSession].self, from: data)
-        else { return }
-        sessions = arr
+        if let data = defaults.data(forKey: key),
+           let arr = try? JSONDecoder().decode([FocusSession].self, from: data) {
+            sessions = arr
+        }
+        if let data = defaults.data(forKey: attemptsKey),
+           let arr = try? JSONDecoder().decode([QuizAttempt].self, from: data) {
+            attempts = arr
+        }
     }
 
     private func persist() {
         guard let data = try? JSONEncoder().encode(sessions) else { return }
         defaults.set(data, forKey: key)
+    }
+    private func persistAttempts() {
+        guard let data = try? JSONEncoder().encode(attempts) else { return }
+        defaults.set(data, forKey: attemptsKey)
+    }
+
+    /// Subject mastery — correct / total across all logged attempts.
+    /// Returns nil for a subject the user has never been tested on so the UI
+    /// can render "—" instead of a misleading 0%.
+    func mastery() -> [Subject: Double] {
+        var total: [Subject: Int] = [:]
+        var correct: [Subject: Int] = [:]
+        for a in attempts {
+            total[a.subject, default: 0] += 1
+            if a.correct { correct[a.subject, default: 0] += 1 }
+        }
+        var result: [Subject: Double] = [:]
+        for (subject, totalCount) in total where totalCount > 0 {
+            result[subject] = Double(correct[subject] ?? 0) / Double(totalCount)
+        }
+        return result
+    }
+    func attemptCount(for subject: Subject) -> Int {
+        attempts.filter { $0.subject == subject }.count
     }
 
     // MARK: - Queries
