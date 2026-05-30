@@ -8,6 +8,13 @@ struct StatsScreen: View {
     @Environment(AppState.self) private var app
     @Environment(\.fl) private var fl
 
+    private var cheerSuffix: String {
+        let school = app.targetSchool.trimmingCharacters(in: .whitespacesAndNewlines)
+        return school.isEmpty
+            ? "分心,專注又往前推一步喵!」"
+            : "分心,離\(school)又近了一點喵!」"
+    }
+
     var body: some View {
         let week = app.weekFocus
         let weekTotal = week.reduce(0) { $0 + $1.minutes }
@@ -169,7 +176,7 @@ struct StatsScreen: View {
                                     Cat(size: 64, mood: .cheer).flFloat(duration: 4)
                                     (Text("「這週擋下 ")
                                      + Text("\(blocked) 次").foregroundStyle(fl.primaryDeep).bold()
-                                     + Text("分心,離台大又近了一點喵!」"))
+                                     + Text(cheerSuffix))
                                     .font(.system(size: 13.5))
                                     .foregroundStyle(fl.inkSoft)
                                     .lineSpacing(3)

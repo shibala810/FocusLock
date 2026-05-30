@@ -56,7 +56,7 @@ struct HomeScreen: View {
     private func greeting(locked: Bool) -> some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("哈囉,考生 👋")
+                Text("哈囉,\(app.userName) 👋")
                     .font(.system(size: 13.5, weight: .heavy))
                     .foregroundStyle(fl.primaryDeep)
                 Text(locked ? "專注結界中" : "今天也加油")

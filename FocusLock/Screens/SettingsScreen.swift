@@ -19,6 +19,13 @@ struct SettingsScreen: View {
         return "\(school) · 尚未設定考試日"
     }
 
+    private var footerLine: String {
+        let school = app.targetSchool.trimmingCharacters(in: .whitespacesAndNewlines)
+        return school.isEmpty
+            ? "繼續加油喵,目標就在前方"
+            : "為了上\(school),一起加油喵"
+    }
+
     var body: some View {
         @Bindable var bApp = app
         FLScreen {
@@ -153,7 +160,7 @@ struct SettingsScreen: View {
 
                         HStack(spacing: 7) {
                             Paw(size: 16, color: fl.paw)
-                            Text("為了上台大,一起加油喵")
+                            Text(footerLine)
                                 .font(.system(size: 12.5))
                                 .foregroundStyle(fl.inkFaint)
                         }
