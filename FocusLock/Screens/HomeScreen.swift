@@ -16,6 +16,15 @@ struct HomeScreen: View {
     @Environment(AppState.self) private var app
     @Environment(\.fl) private var fl
     @State private var pickedMinutes: Int = 60
+    @State private var showCustomSheet: Bool = {
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: "FL_CUSTOM_SHEET")
+        #else
+        return false
+        #endif
+    }()
+    @State private var customHours: Int = 0
+    @State private var customMinutes: Int = 45
 
     var body: some View {
         let locked = app.lockSession.state == .locked
@@ -29,6 +38,17 @@ struct HomeScreen: View {
                 }
                 .padding(.bottom, 110)
             }
+        }
+        .sheet(isPresented: $showCustomSheet) {
+            CustomDurationSheet(
+                hours: $customHours,
+                minutes: $customMinutes,
+                onCancel: { showCustomSheet = false },
+                onConfirm: { total in
+                    pickedMinutes = total
+                    showCustomSheet = false
+                }
+            )
         }
     }
 
@@ -148,17 +168,29 @@ struct HomeScreen: View {
                     }
 
                     Button {
-                        pickedMinutes = 45
+                        // Prefill the picker with whatever's chosen now.
+                        customHours = pickedMinutes / 60
+                        customMinutes = pickedMinutes % 60
+                        showCustomSheet = true
                     } label: {
-                        Text("自訂時長…")
-                            .font(.system(size: 13.5, weight: .heavy))
-                            .foregroundStyle(fl.primaryDeep)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .overlay(
-                                Capsule().strokeBorder(fl.paw,
-                                                       style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
-                            )
+                        HStack(spacing: 4) {
+                            Text(isCustomDuration ? "已自訂・\(durationLabel(pickedMinutes))" : "自訂時長…")
+                            if isCustomDuration {
+                                LineIcon(name: .clock, size: 14, color: fl.primaryDeep)
+                            }
+                        }
+                        .font(.system(size: 13.5, weight: .heavy))
+                        .foregroundStyle(fl.primaryDeep)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .overlay(
+                            Capsule().strokeBorder(fl.paw,
+                                                   style: StrokeStyle(lineWidth: 1.5,
+                                                                       dash: isCustomDuration ? [] : [5, 4]))
+                        )
+                        .background(
+                            Capsule().fill(isCustomDuration ? fl.primarySoft : .clear)
+                        )
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 10)
@@ -166,7 +198,7 @@ struct HomeScreen: View {
                     Button {
                         startLock()
                     } label: {
-                        Text("立即鎖定 · \(DURATIONS.first(where: { $0.minutes == pickedMinutes })?.label ?? "\(pickedMinutes) 分")")
+                        Text("立即鎖定 · \(durationLabel(pickedMinutes))")
                     }
                     .buttonStyle(FLCTAStyle())
                     .padding(.top, 14)
@@ -221,5 +253,92 @@ struct HomeScreen: View {
     private func startLock() {
         app.lockSession.lock(forMinutes: pickedMinutes)
         Task { await ScreenTimeService.shared.startShield() }
+    }
+
+    private var isCustomDuration: Bool {
+        !DURATIONS.contains(where: { $0.minutes == pickedMinutes })
+    }
+    private func durationLabel(_ m: Int) -> String {
+        if let preset = DURATIONS.first(where: { $0.minutes == m }) { return preset.label }
+        let h = m / 60, r = m % 60
+        if h == 0 { return "\(r) 分" }
+        if r == 0 { return "\(h) 時" }
+        return "\(h) 時 \(r) 分"
+    }
+}
+
+// MARK: - Custom duration sheet
+struct CustomDurationSheet: View {
+    @Binding var hours: Int
+    @Binding var minutes: Int
+    var onCancel: () -> Void
+    var onConfirm: (_ totalMinutes: Int) -> Void
+
+    @Environment(\.fl) private var fl
+
+    var body: some View {
+        let total = max(5, hours * 60 + minutes)
+        VStack(spacing: 0) {
+            HStack {
+                Button("取消") { onCancel() }
+                    .foregroundStyle(fl.inkSoft)
+                    .font(.system(size: 16, weight: .heavy))
+                Spacer()
+                Text("自訂時長")
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(fl.ink)
+                Spacer()
+                Button("套用") { onConfirm(total) }
+                    .foregroundStyle(fl.primaryDeep)
+                    .font(.system(size: 16, weight: .heavy))
+                    .disabled(total < 5)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+
+            Divider().background(fl.hairline)
+
+            VStack(spacing: 14) {
+                Text("\(durationText(total))")
+                    .font(.system(size: 32, weight: .heavy).monospacedDigit())
+                    .foregroundStyle(fl.primaryDeep)
+                    .padding(.top, 14)
+
+                HStack(spacing: 0) {
+                    Picker("時", selection: $hours) {
+                        ForEach(0...8, id: \.self) { Text("\($0) 時").tag($0) }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(maxWidth: .infinity)
+
+                    Picker("分", selection: $minutes) {
+                        ForEach(Array(stride(from: 0, to: 60, by: 5)), id: \.self) {
+                            Text("\($0) 分").tag($0)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(maxWidth: .infinity)
+                }
+                .frame(height: 180)
+
+                Text("最短 5 分,最長 8 時")
+                    .font(.system(size: 12))
+                    .foregroundStyle(fl.inkFaint)
+                    .padding(.bottom, 16)
+            }
+            .padding(.horizontal, 20)
+
+            Spacer()
+        }
+        .background(fl.bg)
+        .presentationDetents([.height(380)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func durationText(_ m: Int) -> String {
+        let h = m / 60, r = m % 60
+        if h == 0 { return "\(r) 分" }
+        if r == 0 { return "\(h) 時" }
+        return "\(h) 時 \(r) 分"
     }
 }
