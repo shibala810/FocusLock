@@ -96,6 +96,17 @@ struct HomeScreen: View {
                                 .tracking(2)
                                 .foregroundStyle(fl.ballDark.opacity(0.7))
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .fill(fl.ballCream)
+                                .shadow(color: fl.ballDark.opacity(0.18), radius: 8, y: 4)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .strokeBorder(fl.ballDark.opacity(0.10), lineWidth: 1)
+                        )
                     }
                     HStack(spacing: 7) {
                         LineIcon(name: .shield, size: 16, color: fl.focus)
