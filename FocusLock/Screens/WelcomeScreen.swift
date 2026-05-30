@@ -18,9 +18,9 @@ struct WelcomeScreen: View {
         FLScreen {
             PawField()
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
+                VStack(spacing: 28) {
                     // hero
-                    VStack(spacing: 8) {
+                    VStack(spacing: 14) {
                         HStack(spacing: 8) {
                             HeartLock(size: 26, color: fl.primary)
                             Text("FocusLock")
@@ -30,46 +30,44 @@ struct WelcomeScreen: View {
                         }
 
                         ZStack {
-                            Blob(color: fl.bgBlob)
-                                .frame(width: 268, height: 360)
-                                .offset(y: 4)
-                            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                                .stroke(fl.surface, lineWidth: 3)
-                                .background(
-                                    Image("Kenma")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+                            Blob(color: fl.bgBlob.opacity(0.55))
+                                .frame(width: 220, height: 270)
+                                .offset(y: 2)
+                            Image("Kenma")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 206, height: 248)
+                                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                        .strokeBorder(fl.surface, lineWidth: 3)
                                 )
-                                .frame(width: 256, height: 330)
                                 .modifier(AnyShadow(.pop(fl)))
-                            Volleyball(size: 56, spin: app.spinAnimationEnabled)
-                                .offset(x: 100, y: -150)
+                            Volleyball(size: 50, spin: app.spinAnimationEnabled)
+                                .offset(x: 88, y: -110)
                                 .flFloat()
-                            Paw(size: 24, color: fl.paw)
+                            Paw(size: 22, color: fl.paw)
                                 .rotationEffect(.degrees(-20))
-                                .offset(x: -115, y: 145)
+                                .offset(x: -92, y: 108)
                         }
-                        .padding(.top, 10)
+                        .frame(width: 280, height: 290)
                     }
-                    .padding(.top, 64)
+                    .padding(.top, 56)
                     .padding(.horizontal, 24)
 
                     VStack(spacing: 12) {
-                        VStack(spacing: 4) {
-                            (Text("鎖住分心,\n").foregroundStyle(fl.ink)
-                             + Text("解鎖靠實力").foregroundStyle(fl.primaryDeep))
-                            .font(.system(size: 30, weight: .heavy))
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(2)
-                        }
+                        (Text("鎖住分心,\n").foregroundStyle(fl.ink)
+                         + Text("解鎖靠實力").foregroundStyle(fl.primaryDeep))
+                        .font(.system(size: 30, weight: .heavy))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(2)
+
                         Text("讓衝動先冷靜下來,順便複習幾題。\n麻糬會陪你一起撐過讀書的時光 🏐")
                             .font(.system(size: 14.5))
                             .foregroundStyle(fl.inkSoft)
                             .multilineTextAlignment(.center)
                             .lineSpacing(4)
                     }
-                    .padding(.top, 26)
                     .padding(.horizontal, 28)
 
                     VStack(spacing: 10) {
@@ -99,7 +97,6 @@ struct WelcomeScreen: View {
                             }
                         }
                     }
-                    .padding(.top, 22)
                     .padding(.horizontal, 22)
 
                     VStack(spacing: 12) {
@@ -116,7 +113,6 @@ struct WelcomeScreen: View {
                             .multilineTextAlignment(.center)
                             .lineSpacing(3)
                     }
-                    .padding(.top, 14)
                     .padding(.horizontal, 22)
                     .padding(.bottom, 40)
                 }

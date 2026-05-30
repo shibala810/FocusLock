@@ -10,9 +10,23 @@ struct UnlockFlowView: View {
     @Environment(AppState.self) private var app
     @Environment(\.fl) private var fl
 
-    @State private var phase: UnlockPhase = .confirm
+    @State private var phase: UnlockPhase = {
+        #if DEBUG
+        switch UserDefaults.standard.string(forKey: "FL_PHASE")?.lowercased() {
+        case "cooldown": return .cooldown
+        case "quiz":     return .quiz
+        case "success":  return .success
+        case "fail":     return .fail
+        default: return .confirm
+        }
+        #else
+        return .confirm
+        #endif
+    }()
     @State private var cool: Int = 15
-    @State private var deck: [Question] = []
+    @State private var deck: [Question] = QuestionBank().draw(
+        subjects: Set(Subject.allCases),
+        count: 5)
     @State private var qi: Int = 0
     @State private var correct: Int = 0
     @State private var picked: Int? = nil

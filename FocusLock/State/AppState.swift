@@ -21,8 +21,13 @@ enum AppTheme: String, CaseIterable, Codable {
 
 @Observable
 final class AppState {
+    #if DEBUG
+    var route: AppRoute = UserDefaults.standard.string(forKey: "FL_ROUTE").flatMap(routeFromString) ?? .welcome
+    var tab: MainTab = UserDefaults.standard.string(forKey: "FL_TAB").flatMap(tabFromString) ?? .home
+    #else
     var route: AppRoute = .welcome
     var tab: MainTab = .home
+    #endif
 
     let lockSession = LockSession()
     let bank = QuestionBank()
@@ -104,3 +109,25 @@ final class AppState {
         return s
     }
 }
+
+#if DEBUG
+private func routeFromString(_ s: String) -> AppRoute? {
+    switch s.lowercased() {
+    case "welcome": return .welcome
+    case "main": return .main
+    case "block": return .block
+    case "editschedule": return .editSchedule
+    case "unlock": return .unlock
+    default: return nil
+    }
+}
+private func tabFromString(_ s: String) -> MainTab? {
+    switch s.lowercased() {
+    case "home": return .home
+    case "schedule": return .schedule
+    case "stats": return .stats
+    case "settings": return .settings
+    default: return nil
+    }
+}
+#endif
