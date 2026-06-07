@@ -47,6 +47,9 @@ final class LockSession {
         plannedMinutes = 0
         state = .idle
         timer?.invalidate(); timer = nil
+        // Lift the system-level shield for every unlock path (timer completion,
+        // quiz, emergency) so the locked apps actually reopen.
+        Task { @MainActor in await ScreenTimeService.shared.stopShield() }
     }
 
     private func startTicker() {

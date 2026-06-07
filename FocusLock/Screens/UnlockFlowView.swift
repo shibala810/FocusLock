@@ -470,14 +470,12 @@ struct UnlockFlowView: View {
     private func finish() {
         app.lockSession.unlock(reason: .quizUnlocked)
         app.quizUnlockCount += 1
-        Task { await ScreenTimeService.shared.stopShield() }
         app.route = .main
     }
     private func emergencyUnlock() {
         cooldownTimer?.invalidate(); cooldownTimer = nil
         app.emergencyUnlockCount += 1
         app.lockSession.unlock(reason: .emergency)
-        Task { await ScreenTimeService.shared.stopShield() }
         app.route = .main
     }
     private func cancel() {
